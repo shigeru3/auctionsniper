@@ -1,12 +1,16 @@
+package auctionsniper;
+
 import auctionsniper.ui.Main;
 import auctionsniper.ui.MainWindow;
 
 public class ApplicationRunner {
-	public static final String SNIPER_ID = "sniper";
+	public static final String SNIPER_XMPP_ID = "sniper";
 	public static final String SNIPER_PASSWORD = "sniper";
 	private String STATUS_JOINING = "Joining";
 	private String STATUS_LOST = "Lost";
 	private String STATUS_BIDDING = "Bidding";
+	private String STATUS_WINNING = "Winning";
+	private String STATUS_WON = "Won";
 	private AuctionSniperDriver driver;
 
 	public void startBiddingIn(final FakeAuctionServer auction) {
@@ -14,7 +18,7 @@ public class ApplicationRunner {
 			@Override
 			public void run() {
 				try {
-					Main.main(FakeAuctionServer.XMPP_HOSTNAME, SNIPER_ID, SNIPER_PASSWORD, auction.getItemId());
+					Main.main(FakeAuctionServer.XMPP_HOSTNAME, SNIPER_XMPP_ID, SNIPER_PASSWORD, auction.getItemId());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -38,5 +42,13 @@ public class ApplicationRunner {
 
 	public void hasShownSniperIsBidding() {
 		driver.showsSniperStatus(MainWindow.STATUS_BIDDING);
+	}
+
+	public void hasShownSniperIsWinning() {
+		driver.showsSniperStatus(MainWindow.STATUS_WINNING);
+	}
+
+	public void showsSniperHasWonAuction() {
+		driver.showsSniperStatus(STATUS_WON);
 	}
 }

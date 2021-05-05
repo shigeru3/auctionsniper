@@ -1,3 +1,5 @@
+package auctionsniper;
+
 import org.hamcrest.Matcher;
 import org.jivesoftware.smack.*;
 import auctionsniper.ui.Main;

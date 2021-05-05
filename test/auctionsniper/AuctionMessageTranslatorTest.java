@@ -1,5 +1,6 @@
-import auctionsniper.AuctionEventListener;
-import auctionsniper.AuctionMessageTranslator;
+package auctionsniper;
+
+import auctionsniper.AuctionEventListener.PriceSource;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.packet.Message;
 import org.jmock.Mockery;
@@ -10,10 +11,11 @@ import org.junit.runner.RunWith;
 
 @RunWith(JMock.class)
 public class AuctionMessageTranslatorTest {
+	private static final String SNIPER_ID = "sniper";
 	private final Mockery context = new Mockery();
 	private final AuctionEventListener listener = context.mock(AuctionEventListener.class);
 	public static final Chat UNUSED_CHAT = null;
-	private final AuctionMessageTranslator translator = new AuctionMessageTranslator(listener);
+	private final AuctionMessageTranslator translator = new AuctionMessageTranslator(SNIPER_ID, listener);
 
 	@Test
 	public void notifiesAuctionClosedWhenCloseMessageReceived() {
@@ -26,9 +28,9 @@ public class AuctionMessageTranslatorTest {
 	}
 
 	@Test
-	public void notifiesBidDetailsWhenCurrentPriceMessageReceived() {
+	public void notifiesBidDetailsWhenCurrentPriceMessageReceivedFromOtherBidder() {
 		context.checking(new Expectations() {{
-			exactly(1).of(listener).currentPrice(192, 7);
+			exactly(1).of(listener).currentPrice(192, 7, PriceSource.FromOtherBidder);
 		}});
 		Message message = new Message();
 		message.setBody(
