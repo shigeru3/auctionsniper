@@ -6,6 +6,7 @@ public class ApplicationRunner {
 	public static final String SNIPER_PASSWORD = "sniper";
 	private String STATUS_JOINING = "Joining";
 	private String STATUS_LOST = "Lost";
+	private String STATUS_BIDDING = "Bidding";
 	private AuctionSniperDriver driver;
 
 	public void startBiddingIn(final FakeAuctionServer auction) {
