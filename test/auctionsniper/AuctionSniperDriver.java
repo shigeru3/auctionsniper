@@ -5,7 +5,11 @@ import com.objogate.wl.swing.driver.*;
 import com.objogate.wl.swing.gesture.GesturePerformer;
 import auctionsniper.ui.MainWindow;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import javax.swing.table.JTableHeader;
+
+import static com.objogate.wl.swing.matcher.IterableComponentsMatcher.matching;
+import static com.objogate.wl.swing.matcher.JLabelTextMatcher.withLabelText;
+import static java.lang.String.valueOf;
 
 public class AuctionSniperDriver extends JFrameDriver {
 	public AuctionSniperDriver(int timeoutMills) {
@@ -16,9 +20,15 @@ public class AuctionSniperDriver extends JFrameDriver {
 				new AWTEventQueueProber(timeoutMills, 100));
 	}
 
-	public void showsSniperStatus(String statusText) {
-		new JLabelDriver(
-				this, named(MainWindow.SNIPER_STATUS_NAME)
-		).hasText(equalTo(statusText));
+	public void showsSniperStatus(String itemId, int lastPrice, int lastBid, String statusText) {
+		JTableDriver table = new JTableDriver(this);
+		table.hasRow(
+				matching(withLabelText(itemId), withLabelText(valueOf(lastPrice)), withLabelText(valueOf(lastBid)), withLabelText(statusText))
+		);
+	}
+
+	public void hasColumnTitles() {
+		JTableHeaderDriver headers = new JTableHeaderDriver(this, JTableHeader.class);
+		headers.hasHeaders(matching(withLabelText("Item"), withLabelText("Last Price"), withLabelText("Last Bid"), withLabelText("State")));
 	}
 }

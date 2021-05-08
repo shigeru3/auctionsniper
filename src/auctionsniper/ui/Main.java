@@ -23,10 +23,16 @@ public class Main {
 	public static final String JOIN_COMMAND_FORMAT = "%s@host.docker.internal/Auction";
 	public static final String BID_COMMAND_FORMAT = "bid command format";
 
+	private final SnipersTableModel snipers = new SnipersTableModel();
 	private MainWindow ui;
 
 	private Main() throws Exception {
-		startUserInterface();
+		SwingUtilities.invokeAndWait(new Runnable() {
+			@Override
+			public void run() {
+				ui = new MainWindow(snipers);
+			}
+		});
 	}
 
 	public static void main(String... args) throws Exception {
@@ -46,7 +52,7 @@ public class Main {
 		chat.addMessageListener(
 				new AuctionMessageTranslator(
 						connection.getUser(),
-						new AuctionSniper(auction, new SniperStateDisplayer(ui))
+						new AuctionSniper(itemId, auction, new SwingThreadSniperListener(ui))
 				)
 		);
 		auction.join();
@@ -76,7 +82,7 @@ public class Main {
 		SwingUtilities.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				ui = new MainWindow();
+				ui = new MainWindow(snipers);
 			}
 		});
 	}
