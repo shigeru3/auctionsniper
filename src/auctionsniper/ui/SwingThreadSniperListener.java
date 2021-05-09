@@ -6,10 +6,10 @@ import auctionsniper.SniperSnapshot;
 import javax.swing.*;
 
 public class SwingThreadSniperListener implements SniperListener {
-	private MainWindow ui;
+	private SniperListener listener;
 
-	public SwingThreadSniperListener(MainWindow ui) {
-		this.ui = ui;
+	public SwingThreadSniperListener(SniperListener listener) {
+		this.listener = listener;
 	}
 
 	@Override
@@ -17,7 +17,7 @@ public class SwingThreadSniperListener implements SniperListener {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				ui.sniperStatusChanged(snapshot);
+				listener.sniperStateChanged(snapshot);
 			}
 		});
 	}

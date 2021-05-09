@@ -8,9 +8,11 @@ import org.jivesoftware.smack.XMPPException;
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
-	@SuppressWarnings("unused") private Chat notTobeGCd;
+	@SuppressWarnings("unused") private List<Chat> notTobeGCd = new ArrayList<>();
 	private static final int ARG_HOSTNAME = 0;
 	private static final int ARG_USERNAME = 1;
 	private static final int ARG_PASSWORD = 2;
@@ -37,25 +39,29 @@ public class Main {
 
 	public static void main(String... args) throws Exception {
 		Main main = new Main();
-		main.joinAuction(
-				connection(args[ARG_HOSTNAME], args[ARG_USERNAME], args[ARG_PASSWORD]), args[ARG_ITEM_ID]
-		);
+		XMPPConnection connection = connection(args[ARG_HOSTNAME], args[ARG_USERNAME], args[ARG_PASSWORD]);
+		main.disconnectWhenUICloses(connection);
+		main.addUserRequestListenerFor(connection);
 	}
 
-	private void joinAuction(XMPPConnection connection, String itemId) throws XMPPException {
-		disconnectWhenUICloses(connection);
-		final Chat chat = connection.getChatManager().createChat(auctionId(itemId, connection), null);
-		this.notTobeGCd = chat;
+	private void addUserRequestListenerFor(final XMPPConnection connection) {
+		ui.addUserRequestListener(new UserRequestListener() {
+			@Override
+			public void joinAuction(String itemId) {
+				snipers.addSniper(SniperSnapshot.joining(itemId));
+				final Chat chat = connection.getChatManager().createChat(auctionId(itemId, connection), null);
+				notTobeGCd.add(chat);
 
-		Auction auction = new XMPPAuction(chat);
-
-		chat.addMessageListener(
-				new AuctionMessageTranslator(
-						connection.getUser(),
-						new AuctionSniper(itemId, auction, new SwingThreadSniperListener(ui))
-				)
-		);
-		auction.join();
+				Auction auction = new XMPPAuction(chat);
+				chat.addMessageListener(
+						new AuctionMessageTranslator(
+								connection.getUser(),
+								new AuctionSniper(itemId, auction, new SwingThreadSniperListener(snipers))
+						)
+				);
+				auction.join();
+			}
+		});
 	}
 
 	private void disconnectWhenUICloses(XMPPConnection connection) {
@@ -77,14 +83,4 @@ public class Main {
 		connection.login(username, password, AUCTION_RESOURCE);
 		return connection;
 	}
-
-	private void startUserInterface() throws Exception {
-		SwingUtilities.invokeAndWait(new Runnable() {
-			@Override
-			public void run() {
-				ui = new MainWindow(snipers);
-			}
-		});
-	}
 }
-
