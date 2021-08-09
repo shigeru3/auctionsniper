@@ -24,6 +24,9 @@ public class SniperTableModelTest {
 	private final Mockery context = new Mockery();
 	private TableModelListener listener = context.mock(TableModelListener.class);
 	private final SnipersTableModel model = new SnipersTableModel();
+	private final Auction auction = context.mock(Auction.class);
+	private final AuctionSniper sniper = new AuctionSniper("item 123", auction);
+	private final AuctionSniper anotherSniper = new AuctionSniper("item 123", auction);
 
 	@Before
 	public void attachModelListener() {
@@ -44,10 +47,9 @@ public class SniperTableModelTest {
 			oneOf(listener).tableChanged(with(aChangeInRow(0)));
 		}});
 
-		model.addSniper(joining);
+		model.sniperAdded(sniper);
 		model.sniperStateChanged(bidding);
 		assertRowMatchesSnapshot(0, bidding);
-
 	}
 
 	@Test
@@ -64,7 +66,7 @@ public class SniperTableModelTest {
 			oneOf(listener).tableChanged(with(anInsertionAtRow(0)));
 		}});
 		assertEquals(0, model.getRowCount());
-		model.addSniper(joining);
+		model.sniperAdded(sniper);
 		assertEquals(1, model.getRowCount());
 		assertRowMatchesSnapshot(0, joining);
 	}
@@ -75,8 +77,8 @@ public class SniperTableModelTest {
 			ignoring(listener);
 		}});
 
-		model.addSniper(SniperSnapshot.joining("item 0"));
-		model.addSniper(SniperSnapshot.joining("item 1"));
+		model.sniperAdded(sniper);
+		model.sniperAdded(anotherSniper);
 
 		assertEquals("item 0", cellValue(0, Column.ITEM_IDENTIFIER));
 		assertEquals("item 1", cellValue(1, Column.ITEM_IDENTIFIER));
@@ -89,7 +91,7 @@ public class SniperTableModelTest {
 			allowing(listener).tableChanged(with(anyInsertionEvent()));
 			oneOf(listener).tableChanged(with(aChangeInRow(0)));
 		}});
-		model.addSniper(bidding);
+		model.sniperAdded(sniper);
 		model.sniperStateChanged(bidding);
 		assertRowMatchesSnapshot(0, bidding);
 	}

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-	@SuppressWarnings("unused") private List<Auction> notTobeGCd = new ArrayList<Auction>();
+	@SuppressWarnings("unused") private List<Auction> notTobeGCd = new ArrayList<>();
 	private static final int ARG_HOSTNAME = 0;
 	private static final int ARG_USERNAME = 1;
 	private static final int ARG_PASSWORD = 2;
@@ -20,14 +20,14 @@ public class Main {
 	public static final String JOIN_COMMAND_FORMAT = "%s@host.docker.internal/Auction";
 	public static final String BID_COMMAND_FORMAT = "bid command format";
 
-	private final SnipersTableModel snipers = new SnipersTableModel();
+	private final SniperPortfolio portfolio = new SniperPortfolio();
 	private MainWindow ui;
 
 	private Main() throws Exception {
 		SwingUtilities.invokeAndWait(new Runnable() {
 			@Override
 			public void run() {
-				ui = new MainWindow(snipers);
+				ui = new MainWindow(portfolio);
 			}
 		});
 	}
@@ -40,18 +40,7 @@ public class Main {
 	}
 
 	private void addUserRequestListenerFor(final AuctionHouse auctionHouse) {
-		ui.addUserRequestListener(new UserRequestListener() {
-			@Override
-			public void joinAuction(String itemId) {
-				snipers.addSniper(SniperSnapshot.joining(itemId));
-				Auction auction = auctionHouse.auctionFor(itemId);
-				notTobeGCd.add(auction);
-				auction.addAuctionEventListener(
-						new AuctionSniper(itemId, auction, new SwingThreadSniperListener(snipers))
-				);
-				auction.join();
-			}
-		});
+		ui.addUserRequestListener(new SniperLauncher(auctionHouse, portfolio));
 	}
 
 	private void disconnectWhenUICloses(XMPPAuctionHouse auctionHouse) {
