@@ -14,8 +14,9 @@ import static java.lang.String.valueOf;
 
 public class AuctionSniperDriver extends JFrameDriver {
 	@SuppressWarnings("unchecked")
-	public void startBiddingFor(String itemId) {
-		itemIdField().replaceAllText(itemId);
+	public void startBiddingFor(String itemId, int stopPrice) {
+		textField(MainWindow.NEW_ITEM_ID_NAME).replaceAllText(itemId);
+		textField(MainWindow.NEW_ITEM_STOP_PRICE_NAME).replaceAllText(String.valueOf(stopPrice));
 		bidButton().click();
 	}
 
@@ -47,5 +48,12 @@ public class AuctionSniperDriver extends JFrameDriver {
 	public void hasColumnTitles() {
 		JTableHeaderDriver headers = new JTableHeaderDriver(this, JTableHeader.class);
 		headers.hasHeaders(matching(withLabelText("Item"), withLabelText("Last Price"), withLabelText("Last Bid"), withLabelText("State")));
+	}
+
+	private JTextFieldDriver textField(
+			String fieldName) {
+		JTextFieldDriver fd = new JTextFieldDriver(this, JTextField.class, named(fieldName));
+		fd.focusWithMouse();
+		return fd;
 	}
 }

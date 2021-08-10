@@ -24,7 +24,7 @@ public class MainWindowTest {
 					}
 				}
 		);
-		driver.startBiddingFor("an item-id");
+		driver.startBiddingFor("an item-id", 789);
 		driver.check(buttonProne);
 	}
 

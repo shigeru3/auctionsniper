@@ -16,6 +16,7 @@ public class MainWindow extends JFrame {
 	public static final String STATUS_BIDDING = "Bidding";
 	public static String NEW_ITEM_ID_NAME = "new item";
 	public static String JOIN_BUTTON_NAME = "join button";
+	public static String NEW_ITEM_STOP_PRICE_NAME = "stop price";
 	public final SnipersTableModel snipers = new SnipersTableModel();
 	private Announcer<UserRequestListener> userRequests = Announcer.to(UserRequestListener.class);
 

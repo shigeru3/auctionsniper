@@ -2,6 +2,7 @@ package auctionsniper;
 
 import auctionsniper.ui.Main;
 import auctionsniper.ui.MainWindow;
+import auctionsniper.ui.SnipersTableModel;
 
 import static auctionsniper.FakeAuctionServer.XMPP_HOSTNAME;
 import static auctionsniper.SniperState.*;
@@ -50,7 +51,7 @@ public class ApplicationRunner {
 		return arguments;
 	}
 
-	public void showsSniperHasLostAuction(FakeAuctionServer auction) {
+	public void showsSniperHasLostAuction(FakeAuctionServer auction, int lastPrice, int lastBid) {
 		driver.showsSniperStatus(auction.getItemId(), 0, 0, textFor(LOST));
 	}
 
@@ -70,5 +71,20 @@ public class ApplicationRunner {
 
 	public void showsSniperHasWonAuction(FakeAuctionServer auction, int lastPrice) {
 		driver.showsSniperStatus(auction.getItemId(), lastPrice, lastPrice, textFor(WON));
+	}
+
+	public void startBiddingWithStopPrice(FakeAuctionServer auction, int stopPrice) {
+		startSniper();
+		openBiddingFor(auction, stopPrice);
+	}
+
+	private void openBiddingFor(FakeAuctionServer auction, int stopPrice) {
+		final String itemId = auction.getItemId();
+		driver.startBiddingFor(itemId, stopPrice);
+		driver.showsSniperStatus(itemId, 0, 0, SnipersTableModel.textFor(JOINING));
+	}
+
+	public void hasShownSniperIsLosing(FakeAuctionServer auction, int lastPrice, int lastBid) {
+		driver.showsSniperStatus(auction.getItemId(), lastPrice, lastBid, SnipersTableModel.textFor(SniperState.LOSING));
 	}
 }
